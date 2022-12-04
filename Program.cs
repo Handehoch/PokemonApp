@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PokemonApp.Data;
+using PokemonApp.Interfaces;
+using PokemonApp.Models;
+using PokemonApp.Repository;
 using PokemonReviewApp;
 
 namespace PokemonApp;
@@ -14,6 +17,7 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddTransient<Seed>();
+        builder.Services.AddScoped<IRepository<Pokemon>, PokemonRepository>();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
