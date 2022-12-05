@@ -4,7 +4,7 @@ using PokemonApp.Models;
 
 namespace PokemonApp.Repository;
 
-public class PokemonRepository: IRepository<Pokemon>
+public class PokemonRepository: IPokemonRepository
 {
     private readonly DataContext _context;
 
@@ -21,7 +21,6 @@ public class PokemonRepository: IRepository<Pokemon>
     public Pokemon GetById(int id)
     {
         return _context.Pokemon.First(p => p.Id == id);
-
     }
 
     public Pokemon GetByName(string name)
@@ -50,7 +49,7 @@ public class PokemonRepository: IRepository<Pokemon>
         throw new NotImplementedException();
     }
 
-    public bool ExistsById(int id)
+    public bool Exists(int id)
     {
         return _context.Pokemon.Any(p => p.Id == id);
     }

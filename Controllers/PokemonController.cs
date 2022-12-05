@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using PokemonApp.Dto;
 using PokemonApp.Interfaces;
 using PokemonApp.Models;
 
@@ -8,18 +10,21 @@ namespace PokemonApp.Controllers;
 [Route("api/[controller]")]
 public class PokemonController : Controller
 {
-    private readonly IRepository<Pokemon> _pokemonRepository;
+    private readonly IPokemonRepository _pokemonRepository;
+    private readonly IMapper _mapper;
 
-    public PokemonController(IRepository<Pokemon> pokemonRepository)
+    public PokemonController(IPokemonRepository pokemonRepository, IMapper mapper)
     {
         _pokemonRepository = pokemonRepository;
+        _mapper = mapper;
     }
 
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(ICollection<Pokemon>))]
+    [ProducesResponseType(400)]
     public IActionResult GetPokemons()
     {
-        var pokemons = this._pokemonRepository.GetAll();
+        var pokemons =_mapper.Map<ICollection<PokemonDto>>( _pokemonRepository.GetAll());
 
         if (!ModelState.IsValid) 
             return BadRequest(ModelState);
@@ -29,13 +34,27 @@ public class PokemonController : Controller
 
     [HttpGet("{id:int}")]
     [ProducesResponseType(200, Type = typeof(Pokemon))]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public IActionResult GetById(int id)
     {
-        var pokemon = this._pokemonRepository.GetById(id);
+        if (!_pokemonRepository.Exists(id))
+            return NotFound();
+        
+        var pokemon = _mapper.Map<PokemonDto>(_pokemonRepository.GetById(id));
+        return !ModelState.IsValid ? BadRequest(ModelState) : Ok(pokemon);
+    }
 
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+    [HttpGet("{id:int}/rating")]
+    [ProducesResponseType(200, Type = typeof(double))]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public IActionResult GetRating(int id)
+    {
+        if (!_pokemonRepository.Exists(id))
+            return NotFound();
 
-        return Ok(pokemon);
+        var rating = _pokemonRepository.GetRatingById(id);
+        return !ModelState.IsValid ? BadRequest(ModelState) : Ok(rating);
     }
 }
