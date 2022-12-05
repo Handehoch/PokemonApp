@@ -21,6 +21,18 @@ public class PokemonRepository: IRepository<Pokemon>
     public Pokemon GetById(int id)
     {
         return _context.Pokemon.First(p => p.Id == id);
+
+    }
+
+    public Pokemon GetByName(string name)
+    {
+        return _context.Pokemon.First(p => p.Name == name);
+    }
+
+    public double GetRatingById(int id)
+    {
+        var reviews = _context.Reviews.Where(r => r.Pokemon.Id == id).ToList();
+        return !reviews.Any() ? 0 : (double) reviews.Sum(r => r.Rating) / reviews.Count;
     }
 
     public ICollection<Pokemon> GetAll()
@@ -38,9 +50,14 @@ public class PokemonRepository: IRepository<Pokemon>
         throw new NotImplementedException();
     }
 
-    public void Save()
+    public bool ExistsById(int id)
     {
-        throw new NotImplementedException();
+        return _context.Pokemon.Any(p => p.Id == id);
+    }
+
+    public async void Save()
+    {
+        await _context.SaveChangesAsync();
     }
     public void Dispose()
     {
