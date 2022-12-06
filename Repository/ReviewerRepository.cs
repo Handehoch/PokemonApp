@@ -21,8 +21,9 @@ public class ReviewerRepository: RepositoryBase, IReviewerRepository
     public Reviewer GetById(int id)
     {
         return Context.Reviewers
+            .Where(r => r.Id == id)
             .Include(r => r.Reviews)
-            .First(r => r.Id == id);
+            .First();
     }
 
     public ICollection<Reviewer> GetAll()
@@ -32,7 +33,7 @@ public class ReviewerRepository: RepositoryBase, IReviewerRepository
     
     public ICollection<Review> GetReviewsByReviewerId(int id)
     {
-        return  Context.Reviewers.Where(r => r.Id == id).SelectMany(r => r.Reviews).ToList();
+        return Context.Reviews.Where(r => r.Reviewer.Id == id).ToList();
     }
 
     public Reviewer UpdateById(int id, Reviewer dto)

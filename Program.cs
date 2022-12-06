@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using PokemonApp.Data;
 using PokemonApp.Interfaces;
@@ -16,6 +17,8 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddTransient<Seed>();
+        builder.Services.AddControllers().AddJsonOptions(options =>
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
         builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();

@@ -38,16 +38,19 @@ public class ReviewerController: Controller
         if (!_reviewerRepository.Exists(id))
             return NotFound();
 
-        var review = _mapper.Map<ReviewerDto>(_reviewerRepository.GetById(id));
+        var review = _mapper.Map<Reviewer>(_reviewerRepository.GetById(id));
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(review);
     }
 
-    [HttpGet("pokemon/{reviewerId:int}")]
+    [HttpGet("{reviewerId:int}/reviews")]
     [ProducesResponseType(200, Type = typeof(Review))]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public IActionResult GetReviewsByReviewer(int reviewerId)
     {
+        if (!_reviewerRepository.Exists(reviewerId))
+            return NotFound();
+        
         var reviews = _mapper.Map<ICollection<ReviewDto>>(_reviewerRepository.GetReviewsByReviewerId(reviewerId));
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(reviews);
     }
