@@ -45,17 +45,17 @@ public class CategoryController: Controller
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(category);
     }
 
-    [HttpGet("pokemon/{id:int}")]
+    [HttpGet("pokemon/{categoryId:int}")]
     [ProducesResponseType(200, Type = typeof(Category))]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public IActionResult GetPokemonsByCategoryId(int id)
+    public IActionResult GetPokemonsByCategoryId(int categoryId)
     {
-        if (!_categoryRepository.Exists(id))
+        if (!_categoryRepository.Exists(categoryId))
             return NotFound();
 
         var pokemons = _mapper.Map<ICollection<PokemonDto>>(
-            _categoryRepository.GetPokemonByCategoryId(id));
+            _categoryRepository.GetPokemonByCategoryId(categoryId));
 
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(pokemons);
     }
