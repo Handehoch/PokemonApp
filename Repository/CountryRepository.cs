@@ -5,28 +5,27 @@ using PokemonApp.Models;
 
 namespace PokemonApp.Repository;
 
-public class CountryRepository: ICountryRepository
+public class CountryRepository: RepositoryBase, ICountryRepository
 {
-    private readonly DataContext _context;
 
-    public CountryRepository(DataContext context)
+    public CountryRepository(DataContext context) : base(context)
     {
-        _context = context;
     }
 
-    public Country Create(Country dto)
+    public bool Create(Country dto)
     {
-        throw new NotImplementedException();
+        Context.Countries.Add(dto);
+        return Save();
     }
 
     public Country GetById(int id)
     {
-        return _context.Countries.First(c => c.Id == id);
+        return Context.Countries.First(c => c.Id == id);
     }
 
     public ICollection<Country> GetAll()
     {
-        return _context.Countries.ToList();
+        return Context.Countries.ToList();
     }
 
     public Country UpdateById(int id, Country dto)
@@ -41,26 +40,16 @@ public class CountryRepository: ICountryRepository
 
     public Country GetCountryByOwnerId(int id)
     {
-        return _context.Owners.Where(o => o.Id == id).Select(o => o.Country).First();
+        return Context.Owners.Where(o => o.Id == id).Select(o => o.Country).First();
     }
 
     public ICollection<Owner> GetOwnersByCountryId(int id)
     {
-        return _context.Owners.Where(o => o.Country.Id == id).ToList();
+        return Context.Owners.Where(o => o.Country.Id == id).ToList();
     }
     
     public bool Exists(int id)
     {
-        return _context.Countries.Any(c => c.Id == id);
-    }
-
-    public void Save()
-    {
-        throw new NotImplementedException();
-    }
-    
-    public void Dispose()
-    {
-        throw new NotImplementedException();
+        return Context.Countries.Any(c => c.Id == id);
     }
 }

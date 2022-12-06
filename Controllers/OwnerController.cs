@@ -57,6 +57,4 @@ public class OwnerController: Controller
         var pokemons = _mapper.Map<ICollection<PokemonDto>>(_ownerRepository.GetPokemonsByOwnerId(ownerId));
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(pokemons);
     }
-    
-    
 }

@@ -18,6 +18,37 @@ public class CategoryController: Controller
         _categoryRepository = categoryRepository;
         _mapper = mapper;
     }
+
+    [HttpPost]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(400)]
+    public IActionResult CreateCategory([FromBody] CategoryDto? dto)
+    {
+        if (dto == null)
+            return BadRequest(ModelState);
+
+        var category = _categoryRepository.GetAll()
+            .FirstOrDefault(c => c.Name.Trim().ToUpper() == dto.Name.Trim().ToUpper());
+
+        if (category != null)
+        {
+            ModelState.AddModelError("", "Category already exists");
+            return StatusCode(422, ModelState);
+        }
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var categoryMap = _mapper.Map<Category>(dto);
+
+        if (!_categoryRepository.Create(categoryMap))
+        {
+            ModelState.AddModelError("", "Something went wrong while saving");
+            return StatusCode(500, ModelState);
+        }
+
+        return Ok("Successfully created");
+    }
     
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(ICollection<Category>))]
@@ -25,11 +56,7 @@ public class CategoryController: Controller
     public IActionResult GetCategories()
     {
         var categories =_mapper.Map<ICollection<CategoryDto>>( _categoryRepository.GetAll());
-
-        if (!ModelState.IsValid) 
-            return BadRequest(ModelState);
-
-        return Ok(categories);
+        return !ModelState.IsValid ? BadRequest(ModelState) : Ok(categories);
     }
 
     [HttpGet("{id:int}")]

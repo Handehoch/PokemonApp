@@ -4,33 +4,31 @@ using PokemonApp.Models;
 
 namespace PokemonApp.Repository;
 
-public class OwnerRepository: IOwnerRepository
+public class OwnerRepository: RepositoryBase, IOwnerRepository
 {
-    private readonly DataContext _context;
-
-    public OwnerRepository(DataContext context)
+    public OwnerRepository(DataContext context): base(context)
     {
-        _context = context;
+        
     }
     
-    public Owner Create(Owner dto)
+    public bool Create(Owner dto)
     {
         throw new NotImplementedException();
     }
 
     public Owner GetById(int id)
     {
-        return _context.Owners.First(o => o.Id == id);
+        return Context.Owners.First(o => o.Id == id);
     }
 
     public ICollection<Owner> GetAll()
     {
-        return _context.Owners.ToList();
+        return Context.Owners.ToList();
     }
     
     public ICollection<Owner> GetOwnersByPokemonId(int id)
     {
-        return _context.PokemonOwners
+        return Context.PokemonOwners
             .Where(po => po.PokemonId == id)
             .Select(po => po.Owner)
             .ToList();
@@ -38,7 +36,7 @@ public class OwnerRepository: IOwnerRepository
 
     public ICollection<Pokemon> GetPokemonsByOwnerId(int id)
     {
-        return _context.PokemonOwners
+        return Context.PokemonOwners
             .Where(po => po.OwnerId == id)
             .Select(po => po.Pokemon)
             .ToList();
@@ -56,16 +54,6 @@ public class OwnerRepository: IOwnerRepository
 
     public bool Exists(int id)
     {
-        return _context.Owners.Any(o => o.Id == id);
-    }
-
-    public void Save()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Dispose()
-    {
-        throw new NotImplementedException();
+        return Context.Owners.Any(o => o.Id == id);
     }
 }

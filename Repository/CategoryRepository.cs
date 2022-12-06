@@ -4,28 +4,27 @@ using PokemonApp.Models;
 
 namespace PokemonApp.Repository;
 
-public class CategoryRepository: ICategoryRepository
+public class CategoryRepository: RepositoryBase, ICategoryRepository
 {
-    private readonly DataContext _context;
-
-    public CategoryRepository(DataContext context)
+    public CategoryRepository(DataContext context) : base(context)
     {
-        _context = context;
+        
     }
 
-    public Category Create(Category dto)
+    public bool Create(Category dto)
     {
-        throw new NotImplementedException();
+        Context.Categories.Add(dto);
+        return Save();
     }
 
     public Category GetById(int id)
     {
-        return _context.Categories.First(c => c.Id == id);
+        return Context.Categories.First(c => c.Id == id);
     }
 
     public ICollection<Category> GetAll()
     {
-        return _context.Categories.ToList();
+        return Context.Categories.ToList();
     }
 
     public Category UpdateById(int id, Category dto)
@@ -38,10 +37,9 @@ public class CategoryRepository: ICategoryRepository
         throw new NotImplementedException();
     }
 
-
     public ICollection<Pokemon> GetPokemonByCategoryId(int id)
     {
-        return _context.PokemonCategories
+        return Context.PokemonCategories
             .Where(e => e.CategoryId == id)
             .Select(c => c.Pokemon)
             .ToList();
@@ -49,16 +47,6 @@ public class CategoryRepository: ICategoryRepository
     
     public bool Exists(int id)
     {
-        return _context.Categories.Any(c => c.Id == id);
-    }
-
-    public void Save()
-    {
-        throw new NotImplementedException();
-    }
-    
-    public void Dispose()
-    {
-        
+        return Context.Categories.Any(c => c.Id == id);
     }
 }
