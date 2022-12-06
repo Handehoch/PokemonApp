@@ -45,13 +45,13 @@ public class CountryController: Controller
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(country);
     }
 
-    // TODO implement GetOwnersByCountryId
     [HttpGet("{countryId:int}/owners")]
     [ProducesResponseType(200, Type = typeof(ICollection<OwnerDto>))]
     [ProducesResponseType(400)]
-    IActionResult GetOwnersByCountryId()
+    public IActionResult GetOwnersByCountryId(int countryId)
     {
-        
+        var owners = _mapper.Map<ICollection<OwnerDto>>(_countryRepository.GetOwnersByCountryId(countryId));
+        return !ModelState.IsValid ? BadRequest(ModelState) : Ok(owners);
     }
-    
+
 }

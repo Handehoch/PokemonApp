@@ -46,7 +46,7 @@ public class CountryRepository: ICountryRepository
 
     public ICollection<Owner> GetOwnersByCountryId(int id)
     {
-        return _context.Owners.Where(c => c.Country.Id == id).ToList();
+        return _context.Owners.Where(o => o.Country.Id == id).ToList();
     }
     
     public bool Exists(int id)
