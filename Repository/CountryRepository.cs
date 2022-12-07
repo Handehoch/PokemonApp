@@ -35,9 +35,11 @@ public class CountryRepository: RepositoryBase, ICountryRepository
         return Save();
     }
 
-    public Country DeleteById(int id)
+    public bool DeleteById(int id)
     {
-        throw new NotImplementedException();
+        var country = GetById(id);
+        Context.Countries.Remove(country);
+        return Save();
     }
 
     public Country GetCountryByOwnerId(int id)

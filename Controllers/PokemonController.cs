@@ -109,4 +109,24 @@ public class PokemonController : Controller
 
         return NoContent();
     }
+    
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public IActionResult DeletePokemon(int id)
+    {
+        if (!_pokemonRepository.Exists(id))
+            return NotFound();
+
+        if (!_pokemonRepository.DeleteById(id))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+        }
+        
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        return NoContent();
+    } 
 }

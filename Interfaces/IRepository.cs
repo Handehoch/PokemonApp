@@ -6,6 +6,6 @@ public interface IRepository<T>: IRepositoryBase where T: class
     T GetById(int id);
     ICollection<T> GetAll();
     bool Update(int id, T dto);
-    T DeleteById(int id);
+    bool DeleteById(int id);
     bool Exists(int id);
 }

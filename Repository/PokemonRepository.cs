@@ -64,9 +64,12 @@ public class PokemonRepository : RepositoryBase, IPokemonRepository
         return Update(id, pokemon);
     }
 
-    public Pokemon DeleteById(int id)
+    public bool DeleteById(int id)
     {
-        throw new NotImplementedException();
+        var pokemon = GetById(id);
+        Context.Pokemon.Remove(pokemon);
+        Context.Reviews.RemoveRange(pokemon.Reviews);
+        return Save();
     }
 
     public bool Exists(int id)

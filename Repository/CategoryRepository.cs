@@ -34,9 +34,11 @@ public class CategoryRepository: RepositoryBase, ICategoryRepository
         return Save();
     }
 
-    public Category DeleteById(int id)
+    public bool DeleteById(int id)
     {
-        throw new NotImplementedException();
+        var category = GetById(id);
+        Context.Categories.Remove(category);
+        return Save();
     }
 
     public ICollection<Pokemon> GetPokemonByCategoryId(int id)

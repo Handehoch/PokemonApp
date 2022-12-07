@@ -105,4 +105,25 @@ public class ReviewController: Controller
 
         return NoContent();
     }
+    
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public IActionResult DeleteReview(int id)
+    {
+        if (!_reviewRepository.Exists(id))
+            return NotFound();
+
+        if (!_reviewRepository.DeleteById(id))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return BadRequest(ModelState);
+        }
+        
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        return NoContent();
+    } 
 }

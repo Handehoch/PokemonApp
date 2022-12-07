@@ -43,9 +43,12 @@ public class ReviewerRepository: RepositoryBase, IReviewerRepository
         return Save();
     }
 
-    public Reviewer DeleteById(int id)
+    public bool DeleteById(int id)
     {
-        throw new NotImplementedException();
+        var reviewer = GetById(id);
+        Context.Reviewers.Remove(reviewer);
+        Context.Reviews.RemoveRange(reviewer.Reviews);
+        return Save();
     }
 
     public bool Exists(int id)

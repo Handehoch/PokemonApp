@@ -113,4 +113,25 @@ public class OwnerController: Controller
 
         return NoContent();
     }
+    
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public IActionResult DeleteOwner(int id)
+    {
+        if (!_ownerRepository.Exists(id))
+            return NotFound();
+
+        if (!_ownerRepository.DeleteById(id))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return BadRequest(ModelState);
+        }
+        
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        return NoContent();
+    } 
 }

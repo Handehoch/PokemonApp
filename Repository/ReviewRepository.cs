@@ -49,9 +49,17 @@ public class ReviewRepository: RepositoryBase, IReviewRepository
         return Save();
     }
 
-    public Review DeleteById(int id)
+    public bool DeleteById(int id)
     {
-        throw new NotImplementedException();
+        var review = GetById(id);
+        Context.Reviews.Remove(review);
+        return Save();
+    }
+    
+    public bool DeleteReviews(ICollection<Review> reviews)
+    {
+        Context.Reviews.RemoveRange(reviews);
+        return Save();
     }
 
     public bool Exists(int id)

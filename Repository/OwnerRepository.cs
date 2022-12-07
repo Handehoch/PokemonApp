@@ -51,9 +51,11 @@ public class OwnerRepository: RepositoryBase, IOwnerRepository
         return Save();
     }
 
-    public Owner DeleteById(int id)
+    public bool DeleteById(int id)
     {
-        throw new NotImplementedException();
+        var owner = GetById(id);
+        Context.Owners.Remove(owner);
+        return Save();
     }
 
     public bool Exists(int id)

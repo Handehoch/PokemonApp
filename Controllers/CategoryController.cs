@@ -112,4 +112,25 @@ public class CategoryController: Controller
 
         return NoContent();
     }
+
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public IActionResult DeleteCategory(int id)
+    {
+        if (!_categoryRepository.Exists(id))
+            return NotFound();
+
+        if (!_categoryRepository.DeleteById(id))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return BadRequest(ModelState);
+        }
+        
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        return NoContent();
+    } 
 }
