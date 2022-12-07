@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokemonApp.Dto;
 using PokemonApp.Interfaces;
 using PokemonApp.Models;
+using PokemonApp.Utils;
 
 namespace PokemonApp.Controllers;
 
@@ -17,6 +18,35 @@ public class ReviewerController: Controller
     {
         _reviewerRepository = reviewerRepository;
         _mapper = mapper;
+    }
+
+    [HttpPost]
+    [ProducesResponseType(201, Type = typeof(Reviewer))]
+    [ProducesResponseType(400)]
+    public IActionResult CreateReviewer([FromBody] ReviewerDto? dto)
+    {
+        if (dto == null)
+            return BadRequest(ModelState);
+
+        var reviewer = _reviewerRepository.GetAll()
+            .FirstOrDefault(r => string.Equals(r.FirstName.Trim(), dto.FirstName.Trim(),
+                StringComparison.CurrentCultureIgnoreCase));
+
+        if (reviewer != null)
+        {
+            ModelState.AddModelError("", "Reviewer already exists");
+            return StatusCode(422, ModelState);
+        }
+
+        var reviewerMap = _mapper.Map<Reviewer>(dto);
+
+        if (!_reviewerRepository.Create(reviewerMap))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return StatusCode(500, ModelState);
+        }
+
+        return StatusCode(201, reviewerMap);
     }
     
     [HttpGet]

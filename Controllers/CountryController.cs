@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokemonApp.Dto;
 using PokemonApp.Interfaces;
 using PokemonApp.Models;
+using PokemonApp.Utils;
 
 namespace PokemonApp.Controllers;
 
@@ -17,6 +18,35 @@ public class CountryController: Controller
     {
         _countryRepository = countryRepository;
         _mapper = mapper;
+    }
+
+    [HttpPost]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(400)]
+    public IActionResult CreateCountry([FromBody] CountryDto? dto)
+    {
+        if (dto == null)
+            return BadRequest(ModelState);
+
+        var country = _countryRepository
+            .GetAll()
+            .FirstOrDefault(c => string.Equals(c.Name.Trim(), dto.Name.Trim(),
+                StringComparison.CurrentCultureIgnoreCase));
+
+        if (country != null)
+        {
+            ModelState.AddModelError("", "Country already exists");
+            return StatusCode(422, ModelState);
+        }
+
+        var countryMap = _mapper.Map<Country>(dto);
+        if (!_countryRepository.Create(countryMap))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return StatusCode(500, ModelState);
+        }
+
+        return StatusCode(201, countryMap);
     }
     
     [HttpGet]

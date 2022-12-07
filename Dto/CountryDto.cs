@@ -1,4 +1,6 @@
-﻿namespace PokemonApp.Dto;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PokemonApp.Dto;
 
 public class CountryDto
 {

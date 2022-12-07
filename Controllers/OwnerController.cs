@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokemonApp.Dto;
 using PokemonApp.Interfaces;
 using PokemonApp.Models;
+using PokemonApp.Utils;
 
 namespace PokemonApp.Controllers;
 
@@ -11,12 +12,44 @@ namespace PokemonApp.Controllers;
 public class OwnerController: Controller
 {
     private readonly IOwnerRepository _ownerRepository;
+    private readonly ICountryRepository _countryRepository;
     private readonly IMapper _mapper;
 
-    public OwnerController(IOwnerRepository ownerRepository, IMapper mapper)
+    public OwnerController(IOwnerRepository ownerRepository, ICountryRepository countryRepository, IMapper mapper)
     {
         _ownerRepository = ownerRepository;
+        _countryRepository = countryRepository;
         _mapper = mapper;
+    }
+
+    [HttpPost]
+    [ProducesResponseType(201, Type = typeof(Owner))]
+    [ProducesResponseType(400)]
+    public IActionResult CreateOwner([FromQuery] int countryId, [FromBody] OwnerDto? dto)
+    {
+        if (dto == null)
+            return BadRequest(ModelState);
+
+        var owner = _ownerRepository.GetAll()
+            .FirstOrDefault(o => string.Equals(o.LastName.Trim(), dto.LastName.Trim(), 
+                StringComparison.CurrentCultureIgnoreCase));
+
+        if (owner != null)
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("OWNER_EXISTS") ?? string.Empty);
+            return StatusCode(422, ModelState);
+        }
+
+        var ownerMap = _mapper.Map<Owner>(dto);
+        ownerMap.Country = _countryRepository.GetById(countryId);
+
+        if (!_ownerRepository.Create(ownerMap))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return StatusCode(500, ModelState);
+        }
+
+        return StatusCode(201, ownerMap);
     }
     
     [HttpGet]

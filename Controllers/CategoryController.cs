@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokemonApp.Dto;
 using PokemonApp.Interfaces;
 using PokemonApp.Models;
+using PokemonApp.Utils;
 
 namespace PokemonApp.Controllers;
 
@@ -27,8 +28,10 @@ public class CategoryController: Controller
         if (dto == null)
             return BadRequest(ModelState);
 
-        var category = _categoryRepository.GetAll()
-            .FirstOrDefault(c => c.Name.Trim().ToUpper() == dto.Name.Trim().ToUpper());
+        var category = _categoryRepository
+            .GetAll()
+            .FirstOrDefault(c => string.Equals(c.Name.Trim(), dto.Name.Trim(),
+                StringComparison.CurrentCultureIgnoreCase));
 
         if (category != null)
         {
@@ -43,11 +46,11 @@ public class CategoryController: Controller
 
         if (!_categoryRepository.Create(categoryMap))
         {
-            ModelState.AddModelError("", "Something went wrong while saving");
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
             return StatusCode(500, ModelState);
         }
 
-        return Ok("Successfully created");
+        return StatusCode(201, categoryMap);
     }
     
     [HttpGet]

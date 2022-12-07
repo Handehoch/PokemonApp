@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using PokemonApp.Dto;
 using PokemonApp.Interfaces;
 using PokemonApp.Models;
+using PokemonApp.Utils;
+using static System.String;
 
 namespace PokemonApp.Controllers;
 
@@ -17,6 +20,34 @@ public class ReviewController: Controller
     {
         _reviewRepository = reviewRepository;
         _mapper = mapper;
+    }
+
+    [HttpPost]
+    [ProducesResponseType(201, Type = typeof(Review))]
+    [ProducesResponseType(400)]
+    public IActionResult CreateReview([FromQuery] int reviewerId, [FromQuery] int pokemonId, [FromBody] ReviewDto? dto)
+    {
+        if (dto == null)
+            return BadRequest(ModelState);
+
+        var review = _reviewRepository.GetAll()
+            .FirstOrDefault(r => string.Equals(r.Title.Trim(), dto.Title.Trim(),
+                StringComparison.CurrentCultureIgnoreCase));
+
+        if (review != null)
+        {
+            ModelState.AddModelError("", "Review is already exists");
+            return StatusCode(422, ModelState);
+        }
+
+        var reviewMap = _mapper.Map<Review>(dto);
+        if (!_reviewRepository.CreateWithRelations(reviewerId, pokemonId, reviewMap))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return StatusCode(500, ModelState);
+        }
+
+        return StatusCode(201, reviewMap);
     }
 
     [HttpGet]

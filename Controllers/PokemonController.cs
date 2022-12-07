@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokemonApp.Dto;
 using PokemonApp.Interfaces;
 using PokemonApp.Models;
+using PokemonApp.Utils;
 
 namespace PokemonApp.Controllers;
 
@@ -17,6 +18,34 @@ public class PokemonController : Controller
     {
         _pokemonRepository = pokemonRepository;
         _mapper = mapper;
+    }
+
+    [HttpPost]
+    [ProducesResponseType(201, Type = typeof(Pokemon))]
+    [ProducesResponseType(400)]
+    public IActionResult CreatePokemon([FromQuery] int ownerId, [FromQuery] int categoryId, [FromBody] PokemonDto? dto)
+    {
+        if (dto == null)
+            return BadRequest(ModelState);
+
+        var pokemon = _pokemonRepository.GetAll()
+            .FirstOrDefault(p => string.Equals(p.Name.Trim(), dto.Name.Trim(),
+                StringComparison.CurrentCultureIgnoreCase));
+
+        if (pokemon != null)
+        {
+            ModelState.AddModelError("", "Pokemon already exists");
+            return StatusCode(422, ModelState);
+        }
+
+        var pokemonMap = _mapper.Map<Pokemon>(dto);
+        if (!_pokemonRepository.CreateWithRelations(ownerId, categoryId, pokemonMap))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return StatusCode(500, ModelState);
+        }
+
+        return StatusCode(201, pokemonMap);
     }
 
     [HttpGet]

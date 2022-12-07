@@ -13,7 +13,22 @@ public class PokemonRepository : RepositoryBase, IPokemonRepository
 
     public bool Create(Pokemon dto)
     {
-        throw new NotImplementedException();
+        Context.Pokemon.Add(dto);
+        return Save();
+    }
+    
+    public bool CreateWithRelations(int ownerId, int categoryId, Pokemon pokemon)
+    {
+        var owner = Context.Owners.First(o => o.Id == ownerId);
+        var category = Context.Categories.First(c => c.Id == categoryId);
+
+        var pokemonOwner = new PokemonOwner() { Owner = owner, Pokemon = pokemon };
+        Context.PokemonOwners.Add(pokemonOwner);
+
+        var pokemonCategory = new PokemonCategory() { Category = category, Pokemon = pokemon };
+        Context.PokemonCategories.Add(pokemonCategory);
+
+        return Create(pokemon);
     }
 
     public Pokemon GetById(int id)

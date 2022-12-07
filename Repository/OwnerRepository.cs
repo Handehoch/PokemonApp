@@ -13,7 +13,8 @@ public class OwnerRepository: RepositoryBase, IOwnerRepository
     
     public bool Create(Owner dto)
     {
-        throw new NotImplementedException();
+        Context.Owners.Add(dto);
+        return Save();
     }
 
     public Owner GetById(int id)
