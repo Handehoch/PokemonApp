@@ -30,15 +30,17 @@ public class ReviewerRepository: RepositoryBase, IReviewerRepository
     {
         return Context.Reviewers.ToList();
     }
-    
+
     public ICollection<Review> GetReviewsByReviewerId(int id)
     {
         return Context.Reviews.Where(r => r.Reviewer.Id == id).ToList();
     }
 
-    public Reviewer UpdateById(int id, Reviewer dto)
+    public bool Update(int id, Reviewer dto)
     {
-        throw new NotImplementedException();
+        dto.Id = id;
+        Context.Reviewers.Update(dto);
+        return Save();
     }
 
     public Reviewer DeleteById(int id)

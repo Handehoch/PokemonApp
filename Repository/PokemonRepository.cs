@@ -52,9 +52,16 @@ public class PokemonRepository : RepositoryBase, IPokemonRepository
         return Context.Pokemon.ToList();
     }
 
-    public Pokemon UpdateById(int id, Pokemon dto)
+    public bool Update(int id, Pokemon dto)
     {
-        throw new NotImplementedException();
+        dto.Id = id;
+        Context.Pokemon.Update(dto);
+        return Save();
+    }
+    
+    public bool UpdateWithRelations(int id, int ownerId, int categoryId, Pokemon pokemon)
+    {
+        return Update(id, pokemon);
     }
 
     public Pokemon DeleteById(int id)

@@ -82,4 +82,27 @@ public class ReviewController: Controller
         var reviews = _mapper.Map<ICollection<ReviewDto>>(_reviewRepository.GetReviewsByPokemonId(pokemonId));
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(reviews);
     }
+    
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public IActionResult UpdateReview(int id, [FromBody] ReviewDto? dto)
+    {
+        if (dto == null || !ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        if (!_reviewRepository.Exists(id))
+            return NotFound();
+        
+        var reviewMap = _mapper.Map<Review>(dto);
+
+        if (!_reviewRepository.Update(id, reviewMap))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
 }

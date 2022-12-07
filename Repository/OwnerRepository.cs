@@ -26,7 +26,8 @@ public class OwnerRepository: RepositoryBase, IOwnerRepository
     {
         return Context.Owners.ToList();
     }
-    
+
+
     public ICollection<Owner> GetOwnersByPokemonId(int id)
     {
         return Context.PokemonOwners
@@ -42,10 +43,12 @@ public class OwnerRepository: RepositoryBase, IOwnerRepository
             .Select(po => po.Pokemon)
             .ToList();
     }
-
-    public Owner UpdateById(int id, Owner dto)
+    
+    public bool Update(int id, Owner dto)
     {
-        throw new NotImplementedException();
+        dto.Id = id;
+        Context.Owners.Update(dto);
+        return Save();
     }
 
     public Owner DeleteById(int id)

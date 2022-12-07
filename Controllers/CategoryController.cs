@@ -89,4 +89,27 @@ public class CategoryController: Controller
 
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(pokemons);
     }
+
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public IActionResult UpdateCategory(int id, [FromBody] CategoryDto? dto)
+    {
+        if (dto == null || !ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        if (!_categoryRepository.Exists(id))
+            return NotFound();
+        
+        var categoryMap = _mapper.Map<Category>(dto);
+
+        if (!_categoryRepository.Update(id, categoryMap))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
 }

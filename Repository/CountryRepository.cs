@@ -28,9 +28,11 @@ public class CountryRepository: RepositoryBase, ICountryRepository
         return Context.Countries.ToList();
     }
 
-    public Country UpdateById(int id, Country dto)
+    public bool Update(int id, Country dto)
     {
-        throw new NotImplementedException();
+        dto.Id = id;
+        Context.Countries.Update(dto);
+        return Save();
     }
 
     public Country DeleteById(int id)

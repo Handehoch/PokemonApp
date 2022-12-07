@@ -86,4 +86,27 @@ public class PokemonController : Controller
         var rating = _pokemonRepository.GetRatingById(id);
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(rating);
     }
+    
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public IActionResult UpdatePokemon(int id, [FromBody] PokemonDto? dto)
+    {
+        if (dto == null || !ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        if (!_pokemonRepository.Exists(id))
+            return NotFound();
+        
+        var pokemonMap = _mapper.Map<Pokemon>(dto);
+
+        if (!_pokemonRepository.Update(id, pokemonMap))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
 }

@@ -41,10 +41,12 @@ public class ReviewRepository: RepositoryBase, IReviewRepository
     {
         return Context.Reviews.Where(r => r.Pokemon.Id == id).ToList();
     }
-
-    public Review UpdateById(int id, Review dto)
+    
+    public bool Update(int id, Review dto)
     {
-        throw new NotImplementedException();
+        dto.Id = id;
+        Context.Reviews.Update(dto);
+        return Save();
     }
 
     public Review DeleteById(int id)

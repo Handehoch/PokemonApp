@@ -27,9 +27,11 @@ public class CategoryRepository: RepositoryBase, ICategoryRepository
         return Context.Categories.ToList();
     }
 
-    public Category UpdateById(int id, Category dto)
+    public bool Update(int id, Category dto)
     {
-        throw new NotImplementedException();
+        dto.Id = id;
+        Context.Categories.Update(dto);
+        return Save();
     }
 
     public Category DeleteById(int id)

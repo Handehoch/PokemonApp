@@ -83,5 +83,27 @@ public class CountryController: Controller
         var owners = _mapper.Map<ICollection<OwnerDto>>(_countryRepository.GetOwnersByCountryId(countryId));
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(owners);
     }
+    
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public IActionResult UpdateCountry(int id, [FromBody] CountryDto? dto)
+    {
+        if (dto == null || !ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        if (!_countryRepository.Exists(id))
+            return NotFound();
+        
+        var countryMap = _mapper.Map<Country>(dto);
 
+        if (!_countryRepository.Update(id, countryMap))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
 }

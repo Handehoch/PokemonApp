@@ -90,4 +90,27 @@ public class OwnerController: Controller
         var pokemons = _mapper.Map<ICollection<PokemonDto>>(_ownerRepository.GetPokemonsByOwnerId(ownerId));
         return !ModelState.IsValid ? BadRequest(ModelState) : Ok(pokemons);
     }
+    
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public IActionResult UpdateOwner(int id, [FromBody] OwnerDto? dto)
+    {
+        if (dto == null || !ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        if (!_ownerRepository.Exists(id))
+            return NotFound();
+        
+        var ownerMap = _mapper.Map<Owner>(dto);
+
+        if (!_ownerRepository.Update(id, ownerMap))
+        {
+            ModelState.AddModelError("", ErrorMessage.Errors.Get("SAVE_ERROR") ?? string.Empty);
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
 }
